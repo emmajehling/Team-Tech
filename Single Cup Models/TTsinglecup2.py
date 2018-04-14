@@ -51,19 +51,19 @@ def h(j):           #inserts appropriate h value for each circumferential line
         return 66.609375
 def k(i):
     if i in [0,1,2,3,4,5,6,7]:
-        return 0.45          #ct['kmilk']
+        return 0.45          #milk k-value
     elif i in [8,9]:
-        return 1.05            #ct['kglass']            #material properties
+        return 1.05            #glass k-value        #material properties
 def c(i):
     if i in [0,1,2,3,4,5,6,7]:                      #change nodes to variables...
-        return 3770             #ct['cmilk']
+        return 3770             #milk c-value
     elif i in [8,9]:
-        return 800             #ct['cglass']             #material properties
+        return 800             #glass c-value         #material properties
 def p(i):
     if i in [0,1,2,3,4,5,6,7]:
-        return 1030                 #ct['pmilk']
+        return 1030                 #milk p-value
     elif i in [8,9]:
-        return 2500             #ct['pglass']            #material properties
+        return 2500             #glass p-value        #material properties
 
 def generalnodal(i,j,m,data,ct,t): #i=1-8, j=1-3 (milk AND glass nodes not on boundry)
     v=((-2*k(i)*ct['r'])/(radius(i)*ct['th']))-((2*radius(i)*ct['th'])/ct['r'])+((p(i)*c(i)*radius(i)*ct['th']*ct['r'])/t)
@@ -118,7 +118,7 @@ def innermostleadingcirc(i,j,m,data,ct,t): #i=0,j=0
     return newtemp
 
 def outermostleadingcirc(i,j,m,data,ct,t): #i=9, j=0
-    v=((-k(i)*ct['r'])/(radius(i)*ct['th']))-(((k(i)*ct['th'])/ct['r'])*(radius(i)+(ct['r']/2)))-(h(j)*radius(i)*ct['th'])+((p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t))
+    v=((-k(i)*ct['r'])/(radius(i)*ct['th']))-(((k(i)*ct['th'])/ct['r'])*(radius(i)-(ct['r']/2)))-(h(j)*radius(i)*ct['th'])+((p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t))
     w=((k(i)*ct['th'])/ct['r'])*(radius(i)-(ct['r']/2))
     x=(k(i)*ct['r'])/(radius(i)*ct['th'])
     y=((-p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t))
@@ -135,10 +135,10 @@ def innermostendingcirc(i,j,m,data,ct,t): #i=0,j=4
     return newtemp
 
 def outermostendingcirc(i,j,m,data,ct,t): #i=9,j=4
-    v=((-k(i)*ct['r'])/(2*radius(i)*ct['th']))-(((k(i)*ct['th'])/ct['r'])*(radius(i)-(ct['r']/2)))-(h(j)*radius(i)*ct['th'])+((p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t))
-    w=((k(i)*ct['th'])/ct['r'])*(radius(i)-(ct['r']/2))
+    v=((-k(i)*ct['r'])/(2*radius(i)*ct['th']))-(((k(i)*ct['th'])/ct['r'])*(radius(i)+(ct['r']/2)))-(h(j)*radius(i)*ct['th'])+((p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))+ct['r']))/(8*t))
+    w=((k(i)*ct['th'])/ct['r'])*(radius(i)+(ct['r']/2))
     x=(k(i)*ct['r'])/(2*radius(i)*ct['th'])
-    y=(-p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t)
+    y=(-p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))+ct['r']))/(8*t)
     z=h(j)*radius(i)*ct['th']*ct['Tinf']
     newtemp=((v*temp(i,j,m,data))+(w*temp(i-1,j,m,data))+(x*temp(i,j-1,m,data))+z)/(-y)
     return newtemp
@@ -201,14 +201,8 @@ def main():
     blankmatrix=initmatrix()
     t=int(input("Enter length of time each time step in secds (no more than 30): "))
     ct = {           #constants (K,C,P values actually pulled from functions at top for simpler reading)
-    'r':.002,
-    'th':(2*math.pi)/9,
-    'Kglass':1.05,
-    'Pglass':2500,
-    'Cglass':800,
-    'Kmilk':0.45,
-    'Pmilk':1030,
-    'Cmilk':3770,
+    'r':.002,   #delta r
+    'th':(2*math.pi)/9,     #delta theta
     'Tinf':273       #ambient temperature or temperature of air blown on yogurt cup
     }
     finishedmodel=runmodel(blankmatrix,ct,t)
