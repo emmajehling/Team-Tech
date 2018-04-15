@@ -11,28 +11,14 @@ def makematrix(i,j,mtimes,init):
             circlines.append(radnodes)
         matrix.append(circlines)
     return matrix
-def initmatrix():
-    i=int(input("Enter the number of radial nodes (usually 10): "))      #(no index change necessary because that number of indicies will be appended)
-    j=int(input("Enter the number of circumferential lines (usually 5): "))
-    mNotOK=True
-    while mNotOK:
-        m=int(input("Enter the number of time steps: "))+1   #so that the time 0 is the first time step
-        if m>=3:        #must be 3 or greater
-            mNotOK=False
-        else:
-            print('________')
-            print("must have 3 or more time stamps... Try again:")
-    init=316.5    #inital temperature at time 0       #int(input("Enter the initial value for each element: "))
-    model=makematrix(i,j,m,init)
-    #print("Time 0:")      #displays matrix before any calculations occur
-    #showdata(model)
-    return model
 
-def showdata(data):
-    for timestamp in data:
-        print(timestamp)
-def showtemp(i,j,m,data):   #prints temperature at node i,j at time m from data matrix (because backwards)
-    print(data[m][j][i])
+#def glassthickness(mm,r):   #calculates the number of 'glass' nodes, given the distance between nodes and the disired glass thickness
+    #m=mm/1000       #glass thickness in meters
+    #ratio=m//r      #divides the glass thickness by the radial distance between nodes, and rounds down
+    #return ratio    #returns the number of nodes that will 'be glass' (have glass properties)
+#def changeregions(firstglass):
+    #somehow change k, c, p functions...
+
 
 def radius(i):          #calculate r(i) where r(0) starts at 0.014
     return (i*.002)+.014
@@ -50,19 +36,19 @@ def h(j):           #inserts appropriate h value for each circumferential line
     elif j==4:
         return 66.609375
 def k(i):
-    if i in [0,1,2,3,4,5,6,7]:
+    if i in [0,1,2,3,4,5,6,7]:    #range (0,g):
         return 0.45          #milk k-value
-    elif i in [8,9]:
+    elif i in [8,9]:        #range (g,10)
         return 1.05            #glass k-value        #material properties
 def c(i):
-    if i in [0,1,2,3,4,5,6,7]:                      #change nodes to variables...
+    if i in [0,1,2,3,4,5,6,7]:                      #range (0,g):
         return 3770             #milk c-value
-    elif i in [8,9]:
+    elif i in [8,9]:                                #range (g,10):
         return 800             #glass c-value         #material properties
 def p(i):
-    if i in [0,1,2,3,4,5,6,7]:
+    if i in [0,1,2,3,4,5,6,7]:                  #range (0,g):
         return 1030                 #milk p-value
-    elif i in [8,9]:
+    elif i in [8,9]:                            #range (g,10):
         return 2500             #glass p-value        #material properties
 
 def generalnodal(i,j,m,data,ct,t): #i=1-8, j=1-3 (milk AND glass nodes not on boundry)
@@ -198,13 +184,33 @@ def exportdata(data,timestep):
     thefile.close()
 
 def main():
-    blankmatrix=initmatrix()
-    t=int(input("Enter length of time each time step in secds (no more than 30): "))
-    ct = {           #constants (K,C,P values actually pulled from functions at top for simpler reading)
-    'r':.002,   #delta r
-    'th':(2*math.pi)/9,     #delta theta
-    'Tinf':273       #ambient temperature or temperature of air blown on yogurt cup
-    }
+    #initialize matrix
+    #specifying the number of nodes, circumerential lines, time steps, and the initial tempurature
+    i=int(input("Enter the number of radial nodes (usually 10): "))      #(no index change necessary because that number of indicies will be appended)
+    j=int(input("Enter the number of circumferential lines (usually 5): "))
+    mNotOK=True     #boolean flag to indicate if the minimum number of time steps specified
+    m=int(input("Enter the number of time steps: "))+1   #(+1 so that the time 0 is the first time step)
+    while mNotOK:   #while less than the minimum number of time steps entered
+        if m>=3:        #force re-try if less than 3 time steps entered, must be 3 or greater for program to run due to the way it calculates
+            mNotOK=False
+        else:
+            print('________')
+            print("must have 3 or more time stemps... Try again:")
+    init=float(input("Enter the initial tempurature in Kelvin (usually 316.5): "))    #specify the initial tempurature at time 0
+    blankmatrix=makematrix(i,j,m,init)  #call additional function (at top of program) to create the matrix of data
+
+    #Specify additional constsants
+    t=int(input("Enter length of time each time step in seconds (no more than 30): "))    #delta t, time between time steps
+    ct = {'r':.002,'th':(2*math.pi)/9,} #delta r and delta theta constants (K,C,P values actually pulled from functions at top for simpler reading)
+    temp=float(input("Enter ambient temperature in Fahrenheit (usually 273): "))    #specify the tempurature of the blowing air (ambient tempurature)
+    ct['Tinf']=temp       #adds ambient tempurature entry to constants dictionary
+
+    #Specify thickness of glass jar (and therefore volume of yogurt). Total diameter of the cylinder is .064 meters
+    #thickness=int(input("Enter desired glass thickness in millimeters: "))
+    #gt=glassthickness(thickness,ct['r'])    #returns the number of nodes that will 'be glass' (have glass properties)
+    #firstglassnode=i-gt   #first node in glass region
+    #changeregions(firstglassnode)   #changes which nodes use yogurt and glass properties in the p, c, and k functions
+
     finishedmodel=runmodel(blankmatrix,ct,t)
     exportdata(finishedmodel,t)
 
