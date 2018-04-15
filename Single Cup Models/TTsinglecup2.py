@@ -66,7 +66,7 @@ def p(i):
         return 2500             #glass p-value        #material properties
 
 def generalnodal(i,j,m,data,ct,t): #i=1-8, j=1-3 (milk AND glass nodes not on boundry)
-    v=((-2*k(i)*ct['r'])/(radius(i)*ct['th']))-((2*radius(i)*ct['th'])/ct['r'])+((p(i)*c(i)*radius(i)*ct['th']*ct['r'])/t)
+    v=((-2*k(i)*ct['r'])/(radius(i)*ct['th']))-((2*radius(i)*ct['th'])*k(i)/ct['r'])+((p(i)*c(i)*radius(i)*ct['th']*ct['r'])/t)
     w=((k(i)*radius(i)*ct['th'])/ct['r'])+((k(i)*ct['th'])/2)
     x=((k(i)*radius(i)*ct['th'])/ct['r'])-((k(i)*ct['th'])/2)
     y=(k(i)*ct['r'])/(radius(i)*ct['th'])
@@ -75,9 +75,9 @@ def generalnodal(i,j,m,data,ct,t): #i=1-8, j=1-3 (milk AND glass nodes not on bo
     return newtemp
 
 def innerring(i,j,m,data,ct,t):    #i=0, j=1-3
-    w=((-2*k(i)*(radius(i)+(ct['r']/2)))/(radius(i)*t))+((k(i)*ct['th']*(radius(i)-(ct['r']/2)))/ct['r'])+((p(i)*c(i)*ct['th']*((radius(i)+(ct['r']/2))**2))/(2*t))
-    x=(k(i)*ct['th']*(radius(i)-(ct['r']/2)))/ct['r']
-    y=(k(i)*(radius(i)+(ct['r']/2)))/(radius(i)*t)
+    w=((-2*k(i)*(radius(i)+(ct['r']/2)))/(radius(i)*ct['th']))-((k(i)*ct['th']*(radius(i)+(ct['r']/2)))/ct['r'])+((p(i)*c(i)*ct['th']*((radius(i)+(ct['r']/2))**2))/(2*t))
+    x=(k(i)*ct['th']*(radius(i)+(ct['r']/2)))/ct['r']
+    y=(k(i)*(radius(i)+(ct['r']/2)))/(radius(i)*ct['th'])
     z=((-p(i)*c(i)*ct['th']*((radius(i)+(ct['r']/2))**2))/(2*t))
     newtemp=((w*temp(i,j,m,data))+(x*temp(i+1,j,m,data))+(y*(temp(i,j+1,m,data)+temp(i,j-1,m,data))))/(-z)
     return newtemp
@@ -135,10 +135,10 @@ def innermostendingcirc(i,j,m,data,ct,t): #i=0,j=4
     return newtemp
 
 def outermostendingcirc(i,j,m,data,ct,t): #i=9,j=4
-    v=((-k(i)*ct['r'])/(2*radius(i)*ct['th']))-(((k(i)*ct['th'])/ct['r'])*(radius(i)+(ct['r']/2)))-(h(j)*radius(i)*ct['th'])+((p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))+ct['r']))/(8*t))
-    w=((k(i)*ct['th'])/ct['r'])*(radius(i)+(ct['r']/2))
+    v=((-k(i)*ct['r'])/(2*radius(i)*ct['th']))-(((k(i)*ct['th'])/ct['r'])*(radius(i)-(ct['r']/2)))-(h(j)*radius(i)*ct['th'])+((p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t))
+    w=((k(i)*ct['th'])/ct['r'])*(radius(i)-(ct['r']/2))
     x=(k(i)*ct['r'])/(2*radius(i)*ct['th'])
-    y=(-p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))+ct['r']))/(8*t)
+    y=(-p(i)*c(i)*ct['th']*ct['r']*((4*radius(i))-ct['r']))/(8*t)
     z=h(j)*radius(i)*ct['th']*ct['Tinf']
     newtemp=((v*temp(i,j,m,data))+(w*temp(i-1,j,m,data))+(x*temp(i,j-1,m,data))+z)/(-y)
     return newtemp
