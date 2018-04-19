@@ -199,14 +199,16 @@ def main(): #This is the main function that asks the user to specify details abo
         else:
             print('________')
             print("must have 3 or more time stemps... Try again:")
-    init=float(input("Enter the initial tempurature in Kelvin (usually 316.5): "))    #specify the initial tempurature at time 0
-    blankmatrix=makematrix(i,j,m,init)  #call additional function (at top of program) to create the matrix of data
+    init=float(input("Enter the initial tempurature in Fahrenheit (usually 110.03): "))    #specify the initial tempurature at time 0
+    kinit=(init+459.67)/(9/5)   #convert entered temperature to Kelvin
+    blankmatrix=makematrix(i,j,m,kinit)  #call additional function (at top of program) to create the matrix of data
 
     #Specify additional constsants
     t=int(input("Enter length of time each time step in seconds (no more than 30): "))    #delta t, time between time steps
     ct = {'r':.002,'th':(2*math.pi)/9,} #delta r and delta theta constants (K,C,P values actually pulled from functions at top for simpler reading)
-    temp=float(input("Enter ambient temperature in Fahrenheit (usually 273): "))    #specify the tempurature of the blowing air (ambient tempurature)
-    ct['Tinf']=temp       #adds ambient tempurature entry to constants dictionary
+    temp=float(input("Enter ambient temperature in Fahrenheit (usually 31.73): "))  #specify the tempurature of the blowing air (ambient tempurature)
+    ktemp=(temp+459.67)/(9/5)   #convert entered temperature to Kelvin
+    ct['Tinf']=ktemp       #adds ambient tempurature entry to constants dictionary
 
     #Specify thickness of glass jar (and therefore volume of yogurt). Total diameter of the cylinder is .064 meters, which is currently not editable
     thickness=int(input("Enter desired glass thickness in millimeters (usually 4mm): "))
@@ -216,5 +218,5 @@ def main(): #This is the main function that asks the user to specify details abo
     finishedmodel=runmodel(blankmatrix,ct,t,g,i)    #runs the model!
     exportdata(finishedmodel,t)     #saves the model as a csv file that can be opened in Excel. Must be saved as an Excel Workbook for Excel edits to be saved
 
-if __name__=="__main__":
-    main() 
+if __name__=="__main__":    #calls the main function when the program is run in python
+    main()
