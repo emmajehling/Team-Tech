@@ -162,7 +162,7 @@ def runmodel(data,ct,t,g,b):    #[g is the first node in the specified glass reg
     return data
 
 def exportdata(data,timestep):   #once the model is finished in python, creates a csv (comma separated values) file of the data (can be opened, saved, and edited in Excel)
-    name=input("Enter file name: ") #Prompts user for a file name (must have different name every time!!)
+    name=input("Enter table-formatted file name: ") #Prompts user for a file name (must have different name every time!!)
     while os.path.isfile(name+'.csv'):       #returns True if there is a file with this name
         name=input("Name already used. \nTry a different name: ")  #prompts for a new name until it's not used
     thefile=open(name+'.csv',"w")   #creates this new "csv" file and opens it for "writing"
@@ -185,6 +185,36 @@ def exportdata(data,timestep):   #once the model is finished in python, creates 
     thefile.close()     #closes/saves the file as a .csv in the same folder as the python program.
 #This file is saved as .csv in the same folder as the python program. It can be opened in Excel, but must be saved as an Excel Workbook for any Excel edits to be saved.
 
+def exportdatatograph(data,timestep):   #once the model is finished in python, creates a csv (comma separated values) file of the data (can be opened, saved, and edited in Excel)
+    name=input("Enter graphing file name: ") #Prompts user for a file name (must have different name every time!!)
+    while os.path.isfile(name+'.csv'):       #returns True if there is a file with this name
+        name=input("Name already used. \nTry a different name: ")  #prompts for a new name until it's not used
+    thefile=open(name+'.csv',"w")   #creates this new "csv" file and opens it for "writing"
+    thefile.write('seconds')
+    j=0
+    while j<len(data[0]):   #length will always be 5
+        i=0
+        while i<len(data[0][j]):    #length with always be 10
+            thefile.write(',Node '+str(j)+str(i))    #labels the top line with node references "ji"
+            i+=1
+        j+=1
+    thefile.write('\n')   #new line once finished with that labeling row
+    m=0
+    while m<len(data): #each row is a different time step
+        thefile.write(str(m))   #label first column of each row with the number of seconds
+        j=0
+        while j<len(data[m]):
+            i=0
+            while i<len(data[m][j]):
+                thefile.write(','+str(data[m][j][i]))
+                i+=1
+            j+=1
+        thefile.write('\n')     #new line once finished with that time step line
+        m+=1
+    thefile.close() #closes/saves the file as a .csv in the same folder as the python program.
+    #This file is saved as .csv in the same folder as the python program. It can be opened in Excel, but must be saved as an Excel Workbook for any Excel edits to be saved.
+
+
 def main(): #This is the main function that asks the user to specify details about the model and starts the program
     #initialize matrix
     #specifying the number of nodes, circumerential lines, time steps, and the initial tempurature
@@ -192,19 +222,19 @@ def main(): #This is the main function that asks the user to specify details abo
     i=int(input("Enter the number of radial nodes (usually 10): "))      #(no index change necessary because that number of indicies will be appended)
     j=int(input("Enter the number of circumferential lines (usually 5): "))
     mNotOK=True     #boolean flag to indicate if the minimum number of time steps specified
-    m=int(input("Enter the number of time steps: "))+1   #(+1 so that the time 0 is the first time step)
+    m=int(input("Enter the number of time steps (4 hours is 14400 seconds): "))+1   #(+1 so that the time 0 is the first time step)
     while mNotOK:   #while less than the minimum number of time steps entered
         if m>=3:        #force re-try if less than 3 time steps entered, must be 3 or greater for program to run due to the way it calculates
             mNotOK=False
         else:
             print('________')
             print("must have 3 or more time stemps... Try again:")
-    init=float(input("Enter the initial tempurature in Fahrenheit (usually 110.03): "))    #specify the initial tempurature at time 0
+    init=float(input("Enter the initial temperature in Fahrenheit (usually 110.03): "))    #specify the initial tempurature at time 0
     kinit=(init+459.67)/(9/5)   #convert entered temperature to Kelvin
     blankmatrix=makematrix(i,j,m,kinit)  #call additional function (at top of program) to create the matrix of data
 
     #Specify additional constsants
-    t=int(input("Enter length of time each time step in seconds (no more than 30): "))    #delta t, time between time steps
+    t=int(input("Enter length of time each time step in seconds (usually 1 and no more than 30): "))    #delta t, time between time steps
     ct = {'r':.002,'th':(2*math.pi)/9,} #delta r and delta theta constants (K,C,P values actually pulled from functions at top for simpler reading)
     temp=float(input("Enter ambient temperature in Fahrenheit (usually 31.73): "))  #specify the tempurature of the blowing air (ambient tempurature)
     ktemp=(temp+459.67)/(9/5)   #convert entered temperature to Kelvin
@@ -217,6 +247,7 @@ def main(): #This is the main function that asks the user to specify details abo
 
     finishedmodel=runmodel(blankmatrix,ct,t,g,i)    #runs the model!
     exportdata(finishedmodel,t)     #saves the model as a csv file that can be opened in Excel. Must be saved as an Excel Workbook for Excel edits to be saved
+    exportdatatograph(finishedmodel,t)
 
 if __name__=="__main__":    #calls the main function when the program is run in python
     main()
