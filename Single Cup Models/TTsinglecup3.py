@@ -185,7 +185,7 @@ def exportdata(data,timestep):   #once the model is finished in python, creates 
     thefile.close()     #closes/saves the file as a .csv in the same folder as the python program.
 #This file is saved as .csv in the same folder as the python program. It can be opened in Excel, but must be saved as an Excel Workbook for any Excel edits to be saved.
 
-def exportdatatograph(data,timestep):   #once the model is finished in python, creates a csv (comma separated values) file of the data (can be opened, saved, and edited in Excel)
+def exportdatatograph(data,timestep,freq):   #once the model is finished in python, creates a csv (comma separated values) file of the data (can be opened, saved, and edited in Excel)
     name=input("Enter graphing file name: ") #Prompts user for a file name (must have different name every time!!)
     while os.path.isfile(name+'.csv'):       #returns True if there is a file with this name
         name=input("Name already used. \nTry a different name: ")  #prompts for a new name until it's not used
@@ -210,7 +210,7 @@ def exportdatatograph(data,timestep):   #once the model is finished in python, c
                 i+=1
             j+=1
         thefile.write('\n')     #new line once finished with that time step line
-        m+=1
+        m+=freq
     thefile.close() #closes/saves the file as a .csv in the same folder as the python program.
     #This file is saved as .csv in the same folder as the python program. It can be opened in Excel, but must be saved as an Excel Workbook for any Excel edits to be saved.
 
@@ -234,7 +234,7 @@ def main(): #This is the main function that asks the user to specify details abo
     blankmatrix=makematrix(i,j,m,kinit)  #call additional function (at top of program) to create the matrix of data
 
     #Specify additional constsants
-    t=int(input("Enter length of time each time step in seconds (usually 1 and no more than 30): "))    #delta t, time between time steps
+    t=1    #delta t, time between time steps
     ct = {'r':.002,'th':(2*math.pi)/9,} #delta r and delta theta constants (K,C,P values actually pulled from functions at top for simpler reading)
     temp=float(input("Enter ambient temperature in Fahrenheit (usually 31.73): "))  #specify the tempurature of the blowing air (ambient tempurature)
     ktemp=(temp+459.67)/(9/5)   #convert entered temperature to Kelvin
@@ -246,8 +246,9 @@ def main(): #This is the main function that asks the user to specify details abo
     g=int(i-nodes)   #first node in glass region - passed to every function as an argument for k, c, p functions
 
     finishedmodel=runmodel(blankmatrix,ct,t,g,i)    #runs the model!
+    freq=int(input("For the 'graphing' file, enter the frequency of data points to be output in seconds: "))
     exportdata(finishedmodel,t)     #saves the model as a csv file that can be opened in Excel. Must be saved as an Excel Workbook for Excel edits to be saved
-    exportdatatograph(finishedmodel,t)
+    exportdatatograph(finishedmodel,t,freq)
 
 if __name__=="__main__":    #calls the main function when the program is run in python
     main()
